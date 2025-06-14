@@ -1,0 +1,215 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>good</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .captcha-container {
+            font-size: 24px;
+            font-weight: bold;
+            color: #007BFF;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .captcha-input {
+            margin-right: 10px;
+            padding: 10px;
+            font-size: 18px;
+        }
+        .captcha-error {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .captcha-explanation {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .captcha-label {
+            margin-bottom: 10px;
+        }
+
+        .delay-message {
+            font-size: 1.2rem; /* زيادة حجم الخط */
+            font-weight: bold; /* جعل الخط غامق */
+            color: #333; /* لون النص */
+            margin: 10px 0; /* مساحة فوق وتحت الرسالة */
+            text-align: center; /* محاذاة في المنتصف */
+        }
+
+        .customer-message {
+            color: green;
+            font-size: 40px;
+            font-style: bold;
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+        .contact-small {
+            font-size: 25px;
+            color: grey;
+            margin-top: 15px;
+        }
+        .contact-large {
+            font-size: 70px;
+            color: blue;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        input[type="text"], button {
+            padding: 10px;
+            font-size: 18px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .file-container {
+            margin: 10px 0;
+        }
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+            .captcha-container {
+                font-size: 20px;
+            }
+            .contact-large {
+                font-size: 22px;
+            }
+            .contact-small {
+                font-size: 12px;
+            }
+            video, img {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Media files will be displayed here after solving the CAPTCHA -->
+    <div id="file-list" style="display: none;"></div>
+
+    <script>
+        const files = [
+            { name: 'applepie1', type: 'exe', realType: 'mp4' },
+            { name: 'applepie2', type: 'exe', realType: 'mp4' },
+            { name: 'applepie3', type: 'exe', realType: 'mp4' },
+            { name: 'applepie4', type: 'exe', realType: 'mp4' },
+            { name: 'applepie5', type: 'exe', realType: 'mp4' },
+            { name: 'applepie6', type: 'exe', realType: 'mp4' },
+            { name: 'applepie7', type: 'exe', realType: 'mp4' },
+            { name: 'applepie8', type: 'exe', realType: 'mp4' },
+            { name: 'applepie9', type: 'exe', realType: 'mp4' },
+            { name: 'applepie10', type: 'exe', realType: 'mp4' },
+            { name: 'applepie11', type: 'exe', realType: 'mp4' },
+            { name: 'applepie12', type: 'exe', realType: 'mp4' },
+            { name: 'applepie13', type: 'exe', realType: 'mp4' },
+            { name: 'applepie14', type: 'exe', realType: 'mp4' },
+            { name: 'applepie15', type: 'exe', realType: 'mp4' },
+            { name: 'applepie16', type: 'exe', realType: 'mp4' },
+            { name: 'applepie17', type: 'exe', realType: 'mp4' },
+            { name: 'applepie18', type: 'php', realType: 'jpg' },
+            { name: 'applepie19', type: 'php', realType: 'jpg' },
+            { name: 'applepie20', type: 'php', realType: 'jpg' },
+            { name: 'applepie21', type: 'exe', realType: 'mp4' },
+            { name: 'applepie22', type: 'exe', realType: 'mp4' },
+            { name: 'applepie23', type: 'exe', realType: 'mp4' },
+            { name: 'applepie24', type: 'exe', realType: 'mp4' },
+            { name: 'applepie25', type: 'exe', realType: 'mp4' },
+            { name: 'applepie26', type: 'exe', realType: 'mp4' },
+            { name: 'applepie27', type: 'php', realType: 'jpg' },
+            { name: 'applepie28', type: 'php', realType: 'jpg' },
+            { name: 'applepie29', type: 'php', realType: 'jpg' },
+            { name: 'applepie30', type: 'php', realType: 'jpg' },
+            { name: 'applepie31', type: 'php', realType: 'jpg' },
+            { name: 'applepie32', type: 'php', realType: 'jpg' },
+            { name: 'applepie33', type: 'php', realType: 'jpg' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+    const fileList = document.getElementById('file-list');
+    fileList.style.display = 'block';
+
+    // إضافة الرسالة الجديدة بدلاً من رسالة التأخير
+    const contactMessage = document.createElement('div');
+    contactMessage.classList.add('delay-message');
+    contactMessage.innerHTML = 'you can contact me here and you can ask for proof: <a href="https://bit.ly/tectok">https://bit.ly/tectok</a>';
+    fileList.appendChild(contactMessage);
+
+    files.forEach((file, index) => {
+        const container = document.createElement('div');
+        container.classList.add('file-container');
+        let filePath = `${file.name}.${file.type}`;
+
+        if (file.realType === 'jpg') {
+            const img = document.createElement('img');
+            img.src = filePath;
+            img.width = 600;
+            img.loading = 'lazy';
+            container.appendChild(img);
+        } else if (file.realType === 'mp4') {
+            const video = document.createElement('video');
+            video.width = 600;
+            video.controls = true;
+            video.preload = 'metadata';
+
+            const source = document.createElement('source');
+            source.src = filePath;
+            source.type = 'video/mp4';
+            video.appendChild(source);
+
+            container.appendChild(video);
+        }
+
+        if (file.name === 'applepie17') {
+            const smallContact = document.createElement('div');
+            smallContact.classList.add('contact-small');
+            smallContact.innerHTML = '  contact me: <a href="https://bit.ly/tectok">https://bit.ly/tectok</a>';
+            fileList.appendChild(smallContact);
+        }
+
+        if (file.name === 'applepie30') {
+            const customerMessage = document.createElement('div');
+            customerMessage.classList.add('customer-message');
+            customerMessage.textContent = 'One of my customers:';
+            fileList.appendChild(customerMessage);
+        }
+
+        fileList.appendChild(container);
+    });
+
+    const largeContact = document.createElement('div');
+    largeContact.classList.add('contact-large');
+    largeContact.innerHTML = 'contact me: <a href="https://bit.ly/tectok">https://bit.ly/tectok</a>';
+    fileList.appendChild(largeContact);
+});
+
+    </script>
+</body>
+</html>
